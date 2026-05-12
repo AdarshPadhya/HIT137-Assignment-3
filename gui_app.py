@@ -166,4 +166,97 @@ class GUIApp:
 
         self.update_status()  # update label
 
+    def is_click_on_modified_image(self, x, y):
+        # checking if click is inside right image area
+        return (
+            self.right_x <= x <= self.right_x + 450
+            and self.image_y <= y <= self.image_y + 300
+        )
+    def draw_red_circle(self, x, y):
+        # draw circle on modified image
+        self.canvas.create_oval(
+            x - 18,
+            y - 18,
+            x + 18,
+            y + 18,
+            outline="red",
+            width=3
+        )
+
+        # calculate corresponding position on original image
+        original_x = x - self.right_x + self.left_x
+        original_y = y
+
+        # draw same circle on original image
+        self.canvas.create_oval(
+            original_x - 18,
+            original_y - 18,
+            original_x + 18,
+            original_y + 18,
+            outline="red",
+            width=3
+        )
+
+    def reveal_differences(self):
+        if self.logic is None:  # if no game
+            return
+
+        unfound_regions = self.logic.get_unfound_regions()  # get remaining diff
+
+        # loop through all and draw blue circles
+        for x, y, w, h in unfound_regions:
+            self.draw_blue_circle(x, y, w, h)
+
+        self.logic.game_over = True  # end game
+
+        messagebox.showinfo(
+            "Reveal",
+            "All remaining differences have been revealed. Load a new image to restart."
+        )
+
+        self.update_status()
+
+    def draw_blue_circle(self, x, y, w, h):
+        # get center of rectangle
+        center_x = x + w // 2
+        center_y = y + h // 2
+
+        # positions for both images
+        right_center_x = self.right_x + center_x
+        screen_y = self.image_y + center_y
+
+        left_center_x = self.left_x + center_x
+
+        # draw on modified image
+        self.canvas.create_oval(
+            right_center_x - 25,
+            screen_y - 25,
+            right_center_x + 25,
+            screen_y + 25,
+            outline="blue",
+            width=3
+        )
+
+        # draw on original image
+        self.canvas.create_oval(
+            left_center_x - 25,
+            screen_y - 25,
+            left_center_x + 25,
+            screen_y + 25,
+            outline="blue",
+            width=3
+        )
+
+    def update_status(self):
+        # update status label text
+        if self.logic is None:
+            self.status_label.config(text="Load an image to start")
+        else:
+            self.status_label.config(
+                text=f"Remaining: {self.logic.remaining} | Mistakes: {self.logic.mistakes}/3"
+            )
+
+    def run(self):
+        self.root.mainloop()  # start GUI loop
+
         self.update_status()  # update game status
