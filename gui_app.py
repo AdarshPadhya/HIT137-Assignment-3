@@ -127,4 +127,43 @@ class GUIApp:
             image=self.modified_photo
         )
 
+    def handle_click(self, event):
+        if self.logic is None:  # if no game started
+            return
+
+        if self.logic.game_over:  # if game already finished
+            messagebox.showinfo("Game Over", "Please load a new image to play again.")
+            return
+
+        # check if click is inside modified image
+        if not self.is_click_on_modified_image(event.x, event.y):
+            return
+
+        # convert screen coords to image coords
+        image_x = event.x - self.right_x
+        image_y = event.y - self.image_y
+
+        result = self.logic.check_click(image_x, image_y)  # check if correct click
+
+        # if correct or finished draw red circle
+        if result == "correct" or result == "finished":
+            self.draw_red_circle(event.x, event.y)
+
+        if result == "wrong":
+            messagebox.showinfo("Wrong Click", "That is not a difference.")
+
+        elif result == "mistake_limit":
+            messagebox.showwarning(
+                "Game Over",
+                "You made 3 mistakes. No more guesses allowed."
+            )
+
+        elif result == "finished":
+            messagebox.showinfo(
+                "Congratulations",
+                "You found all 5 differences!"
+            )
+
+        self.update_status()  # update label
+
         self.update_status()  # update game status
