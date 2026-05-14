@@ -1,5 +1,5 @@
 class GameLogic:
-    def _init_(self, difference_regions):
+    def __init__(self, difference_regions):
         self.difference_regions = difference_regions  # list of all diff areas from image processor
         self.found_regions = []  # store indexes of found differences
         self.remaining = len(difference_regions)  # how many still left to find

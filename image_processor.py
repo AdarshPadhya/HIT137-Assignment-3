@@ -36,7 +36,7 @@ class BrightnessChange(Alteration):
 
 
 class ImageProcessor:
-    def _init_(self):
+    def __init__(self):
         # list of all possible alterations
         self.alterations = [ColourShift(), BlurEffect(), BrightnessChange()]
 
